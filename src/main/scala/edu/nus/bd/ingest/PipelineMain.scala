@@ -26,14 +26,6 @@ object PipelineMain {
     LogManager.getRootLogger.setLevel(Level.WARN)
     spark.sparkContext.setLogLevel("ERROR")
 
- /*   val path = Paths.get("/jars")
-    println (s"Path is a directory : ${path.toFile.isDirectory}")
-    println ("printing all files in the directory")
-    if (path.toFile.isDirectory){
-      path.toFile.listFiles().foreach(println)
-    }*/
-
-
     runPipeline(filePath)
 
   }
@@ -45,7 +37,7 @@ object PipelineMain {
         .format("csv")
         .option("header", true)
         .option("delimiter", "\t")
-      .option("inferSchema", true)
+        .option("inferSchema", true)
         .load(filePath)
 
     sourceRawDf.printSchema()
