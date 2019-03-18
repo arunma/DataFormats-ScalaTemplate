@@ -2,13 +2,14 @@ package edu.nus.bd.ingest
 
 import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 
 object PipelineMain {
-
   def main(args: Array[String]): Unit = {
-    val filePath = args(0)
+
+    val readFilePath = args(0)
+    val outputFilePath =  args(1)
 
     val sparkConf = buildSparkConf()
 
@@ -18,15 +19,19 @@ object PipelineMain {
       .appName("Boring Pipeline")
       .master("local[*]")
       .getOrCreate()
-
     LogManager.getRootLogger.setLevel(Level.WARN)
     spark.sparkContext.setLogLevel("ERROR")
 
-    runPipeline(filePath)
+    runPipeline(readFilePath, outputFilePath)
 
   }
 
-  private def runPipeline(filePath: String)(implicit spark: SparkSession) = {
+  private def runPipeline(readFilePath: String, outputFilePath: String)(implicit spark: SparkSession) = {
+    val inputDf = readFile(readFilePath)
+    writeData(inputDf, outputFilePath)
+  }
+
+  private def readFile(filePath: String)(implicit spark: SparkSession) = {
 
     val schema = StructType(Seq(
       StructField("url", StringType),
@@ -45,14 +50,21 @@ object PipelineMain {
       spark
         .read
         .format("csv")
+        .option("header", true)
         .option("delimiter", "\t")
         .schema(schema)
         .load(filePath)
 
-    sourceRawDf.printSchema()
-    sourceRawDf.show()
+    sourceRawDf
+  }
+
+
+  def writeData(inputDf: DataFrame, outputFilePath: String)(implicit spark: SparkSession): Unit = {
+
 
   }
+
+
 
 
   def buildSparkConf(): SparkConf = new SparkConf()
