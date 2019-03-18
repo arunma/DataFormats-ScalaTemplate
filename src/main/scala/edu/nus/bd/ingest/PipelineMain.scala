@@ -3,6 +3,7 @@ package edu.nus.bd.ingest
 import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types._
 
 object PipelineMain {
 
@@ -26,6 +27,30 @@ object PipelineMain {
   }
 
   private def runPipeline(filePath: String)(implicit spark: SparkSession) = {
+
+    val schema = StructType(Seq(
+      StructField("url", StringType),
+      StructField("urlid", IntegerType),
+      StructField("alchemy_category", StringType),
+      StructField("is_news", StringType),
+      StructField("lengthyLinkDomain", IntegerType),
+      StructField("news_front_page", StringType),
+      StructField("non_markup_alphanum_characters", LongType),
+      StructField("numberOfLinks", IntegerType),
+      StructField("numwords_in_url", IntegerType),
+      StructField("spelling_errors_ratio", DoubleType)
+    ))
+
+    val sourceRawDf =
+      spark
+        .read
+        .format("csv")
+        .option("delimiter", "\t")
+        .schema(schema)
+        .load(filePath)
+
+    sourceRawDf.printSchema()
+    sourceRawDf.show()
 
   }
 
