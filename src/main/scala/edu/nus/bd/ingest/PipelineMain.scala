@@ -1,13 +1,8 @@
 package edu.nus.bd.ingest
 
-import java.nio.file.Paths
-
 import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
-
-import scala.io.Source
 
 object PipelineMain {
 
