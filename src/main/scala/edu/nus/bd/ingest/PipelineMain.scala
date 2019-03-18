@@ -60,12 +60,11 @@ object PipelineMain {
 
 
   def writeData(inputDf: DataFrame, outputFilePath: String)(implicit spark: SparkSession): Unit = {
-
-
+    inputDf
+      .write
+      .format("avro")
+      .save(outputFilePath)
   }
-
-
-
 
   def buildSparkConf(): SparkConf = new SparkConf()
     .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
