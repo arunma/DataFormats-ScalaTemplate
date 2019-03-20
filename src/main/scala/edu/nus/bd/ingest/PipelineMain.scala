@@ -2,14 +2,12 @@ package edu.nus.bd.ingest
 
 import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.apache.spark.sql.types._
+import org.apache.spark.sql.SparkSession
 
 object PipelineMain {
-  def main(args: Array[String]): Unit = {
 
-    val readFilePath = args(0)
-    val outputFilePath = args(1)
+  def main(args: Array[String]): Unit = {
+    val filePath = args(0)
 
     val sparkConf = buildSparkConf()
 
@@ -19,54 +17,18 @@ object PipelineMain {
       .appName("Boring Pipeline")
       .master("local[*]")
       .getOrCreate()
+
     LogManager.getRootLogger.setLevel(Level.WARN)
     spark.sparkContext.setLogLevel("ERROR")
 
-    runPipeline(readFilePath, outputFilePath)
+    runPipeline(filePath)
 
   }
 
-  private def runPipeline(readFilePath: String, outputFilePath: String)(implicit spark: SparkSession) = {
-    val inputDf = readFile(readFilePath)
-    writeData(inputDf, outputFilePath)
+  private def runPipeline(filePath: String)(implicit spark: SparkSession) = {
+
   }
 
-  private def readFile(filePath: String)(implicit spark: SparkSession) = {
-
-    val schema = StructType(Seq(
-      StructField("url", StringType),
-      StructField("urlid", IntegerType),
-      StructField("alchemy_category", StringType),
-      StructField("is_news", StringType),
-      StructField("lengthyLinkDomain", IntegerType),
-      StructField("news_front_page", StringType),
-      StructField("non_markup_alphanum_characters", LongType),
-      StructField("numberOfLinks", IntegerType),
-      StructField("numwords_in_url", IntegerType),
-      StructField("spelling_errors_ratio", DoubleType)
-    ))
-
-    val sourceRawDf =
-      spark
-        .read
-        .format("csv")
-        .option("header", true)
-        .option("delimiter", "\t")
-        .schema(schema)
-        .load(filePath)
-
-    sourceRawDf
-  }
-
-
-  def writeData(inputDf: DataFrame, outputFilePath: String)(implicit spark: SparkSession): Unit = {
-    inputDf
-      .write
-      .mode(SaveMode.Overwrite)
-      .option("compression", "snappy")
-      .format("parquet")
-      .save(outputFilePath)
-  }
 
   def buildSparkConf(): SparkConf = new SparkConf()
     .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
