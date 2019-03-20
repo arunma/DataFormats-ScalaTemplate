@@ -26,17 +26,7 @@ object PipelineMain {
   }
 
   private def runPipeline(filePath: String)(implicit spark: SparkSession) = {
-    val sourceRawDf =
-      spark
-        .read
-        .format("csv")
-        .option("header", true)
-        .option("delimiter", "\t")
-        .option("inferSchema", true)
-        .load(filePath)
 
-    sourceRawDf.printSchema()
-    sourceRawDf.show()
   }
 
 
