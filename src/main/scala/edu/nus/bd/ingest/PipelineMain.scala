@@ -2,14 +2,14 @@ package edu.nus.bd.ingest
 
 import org.apache.log4j.{Level, LogManager}
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.spark.sql.types._
 
 object PipelineMain {
   def main(args: Array[String]): Unit = {
 
     val readFilePath = args(0)
-    val outputFilePath =  args(1)
+    val outputFilePath = args(1)
 
     val sparkConf = buildSparkConf()
 
@@ -62,7 +62,9 @@ object PipelineMain {
   def writeData(inputDf: DataFrame, outputFilePath: String)(implicit spark: SparkSession): Unit = {
     inputDf
       .write
-      .format("avro")
+      .mode(SaveMode.Overwrite)
+      .option("compression", "snappy")
+      .format("parquet")
       .save(outputFilePath)
   }
 
